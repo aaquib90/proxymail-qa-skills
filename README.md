@@ -6,8 +6,9 @@ Code, Codex, Cursor, Qoder, OpenCode and other agents that read skills.
 
 | Skill | What it does |
 | --- | --- |
+| [auth-regression-pack](skills/auth-regression-pack/SKILL.md) | Checks sign-up, password reset and invitation emails the same way every time, including reused and replaced links, and reports what changed since the last run |
 | [email-delivery-troubleshooting](skills/email-delivery-troubleshooting/SKILL.md) | Finds out why an app's emails aren't arriving: email providers in sandbox mode (Amazon SES, Resend, Mailgun, Postmark, Supabase), suppression lists, rate limits and links that point at localhost |
-| [email-e2e-tests](skills/email-e2e-tests/SKILL.md) | Writes Playwright, Cypress, Puppeteer and pytest tests that sign up, read the code or link, and finish the flow, and runs them in CI |
+| [email-e2e-tests](skills/email-e2e-tests/SKILL.md) | Writes Playwright, Cypress, Puppeteer and pytest tests that sign up, read the code or link, check the email and finish the flow, and runs them in CI with a report on the pull request |
 | [mobile-sign-up-testing](skills/mobile-sign-up-testing/SKILL.md) | Tests sign-up in iOS, Android, React Native, Expo and Flutter apps, by driving a simulator or with Maestro, XCUITest, Espresso, Detox or Appium |
 | [signup-form-email-validation](skills/signup-form-email-validation/SKILL.md) | Checks a form accepts valid but unusual addresses (plus tags, apostrophes, capitals) and rejects invalid ones |
 
@@ -28,7 +29,7 @@ The troubleshooting skill is useful without an account.
 
 For Claude Code, Cursor and Qoder there's also a
 [plugin](https://github.com/aaquib90/proxymail-qa-plugin) that adds the MCP
-server and the main sign-up skill.
+server, the main sign-up skill and the auth regression pack.
 
 ## Qoder
 
