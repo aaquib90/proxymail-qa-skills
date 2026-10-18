@@ -1,7 +1,7 @@
 ---
 name: mobile-sign-up-testing
 description: Tests sign-up, email verification codes, magic links and password resets in iOS, Android, React Native, Expo and Flutter apps with disposable Proxy Mail QA inboxes, either by driving the iOS Simulator or Android emulator directly or by writing Maestro, XCUITest, Espresso, Detox, Appium or Flutter integration tests. Covers opening verify links in the app (Universal Links, App Links, custom schemes such as myapp:// and exp://), cold-start link handling and localhost links on the Android emulator. Use when someone asks to test a mobile app's sign-up, login code or email link.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Testing sign-up emails in mobile apps
@@ -20,14 +20,17 @@ The app's email provider must be able to send to any address. In sandbox or test
 ## Drive the simulator or emulator
 
 1. Build the app and launch it in the iOS Simulator or Android emulator.
-2. Create an address with `create_address` and `{"label": "Mobile sign-up", "password": true}`. Add `"age"` or `"country"` if the form asks for a date of birth or where the user lives.
+2. Create an address with `create_address` and `{"label": "Mobile sign-up", "password": true}`. Add `"age"` or `"country"` if the form asks for a date of birth or where the user lives, and `"environment"` (such as `"staging"`) for the build being tested, so the person can find the account later.
 3. Tap into the sign-up form and type the address and password. The screen can lag a moment: check a screenshot shows what was typed before tapping the button.
 4. Wait with `wait_for_code`, or `wait_for_link` for a link. Each waits up to 30 seconds.
-5. Type the code into the app, or open the link on the device, not in a desktop browser, so the app handles it:
+5. Type the code into the app. If the app shows one box per digit, tap the first box and type the whole code: most move to the next box on each digit. If a box keeps only one digit and focus doesn't move, fill each box in order. Check every digit is in place before submitting: a partial code counts as a wrong attempt. Or open the link on the device, not in a desktop browser, so the app handles it:
    - iOS Simulator: `xcrun simctl openurl booted "$LINK"`, with the link in the `LINK` shell variable. For a custom scheme, iOS first asks "Open in …?": tap Open.
    - Android emulator: `adb shell "am start -W -a android.intent.action.VIEW -d '$LINK'"` (the inner quotes keep `&` in the link from splitting the command on the device).
    - A simulator tool's own open-URL action works too.
 6. Take a screenshot and check the app shows the account as verified or signed in, on the right screen. Take another before deciding a step failed.
+7. Check the email itself with `check_email` and `"expect_host"` set to the domain the app's links open (its Universal Link or App Link domain), and `count_emails` for a duplicate. When the app runs against a server on the computer (`localhost:3000`, or `10.0.2.2:3000` from the Android emulator), mark that host once with `mark_dev_host`, so its links pass.
+
+To sign in again as an account made earlier, `list_addresses` with `"environment"` and `"has_password": true` finds it; where the connection has `get_sign_in`, that returns the account and its password in one call.
 
 If the email has both a web link and one that opens the app (`myapp://…`), the web link comes first; `wait_for_link` with `"app": true` returns the app one.
 
@@ -43,6 +46,8 @@ If the email has both a web link and one that opens the app (`myapp://…`), the
 | Appium | `driver.execute('mobile: deepLink', { url, package })` on Android, `{ url, bundleId }` on iOS | https://proxymail.qa/docs/detox-appium |
 
 Detox and Appium tests can use the `proxymail-qa` npm package directly. In every framework, record the time just before submitting the form and pass it as `since` to the wait, so it never picks up an earlier run's code.
+
+Every helper also has, in its own language: `countEmails` and `checkEmail` (pass the app's link domain as the expected host), `expectNoEmail`, `signInAccount` for a saved test account, `checkOutAccount` and `returnAccount` to borrow one no other test has, and `unused` on the code wait for a resent code. In CI with the Proxy Mail QA GitHub Action, pass `PROXYMAIL_QA_RUN` to the tests the same way as the key and give each helper the test's name, so the pull request's report says which test each email came from. Maestro's script takes the same as actions (`count`, `check`, `none`, `signin`, `checkout`, `return`).
 
 ## What to check in the app
 
