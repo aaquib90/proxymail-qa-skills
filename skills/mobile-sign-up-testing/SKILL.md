@@ -1,7 +1,7 @@
 ---
 name: mobile-sign-up-testing
 description: Tests sign-up, email verification codes, magic links and password resets in iOS, Android, React Native, Expo and Flutter apps with disposable Proxy Mail QA inboxes, either by driving the iOS Simulator or Android emulator directly or by writing Maestro, XCUITest, Espresso, Detox, Appium or Flutter integration tests. Covers opening verify links in the app (Universal Links, App Links, custom schemes such as myapp:// and exp://), cold-start link handling and localhost links on the Android emulator. Use when someone asks to test a mobile app's sign-up, login code or email link.
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Testing sign-up emails in mobile apps
@@ -29,6 +29,8 @@ The app's email provider must be able to send to any address. In sandbox or test
    - A simulator tool's own open-URL action works too.
 6. Take a screenshot and check the app shows the account as verified or signed in, on the right screen. Take another before deciding a step failed.
 7. Check the email itself with `check_email` and `"expect_host"` set to the domain the app's links open (its Universal Link or App Link domain), and `count_emails` for a duplicate. When the app runs against a server on the computer (`localhost:3000`, or `10.0.2.2:3000` from the Android emulator), mark that host once with `mark_dev_host`, so its links pass.
+
+For an offer the app sends after sign-up, `wait_for_code` with `"kind": "coupon"` returns its coupon (with the discount and valid-until date the email states, and `after_seconds`, how long it took); type it into the app's promo field.
 
 To sign in again as an account made earlier, `list_addresses` with `"environment"` and `"has_password": true` finds it; where the connection has `get_sign_in`, that returns the account and its password in one call.
 
