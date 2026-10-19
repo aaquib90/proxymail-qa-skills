@@ -1,7 +1,7 @@
 ---
 name: email-e2e-tests
 description: Writes automated end-to-end tests for sign-up, email verification, login codes (OTP), magic links, password resets and invites, using disposable Proxy Mail QA inboxes from Playwright, Cypress, Puppeteer, Jest, Vitest or pytest, and runs them in CI such as GitHub Actions. Also checks that an email was sent exactly once or not at all, its links, text, language and phone layout, and reports which test each email came from. Use when someone asks to test or automate an email flow, read a verification code or link in a test, or assert on the emails an app sends.
-version: 1.1.0
+version: 1.2.0
 ---
 
 # End-to-end tests for email flows
@@ -118,10 +118,11 @@ In Python, `check_email(address, since=submitted, expect_host=..., expect_text=[
 ## Assert an email was sent once, or not at all
 
 ```ts
-// An unsubscribed user gets no newsletter: throws as soon as one arrives.
+// An unsubscribed user gets no newsletter: throws as soon as a marketing
+// email arrives, while receipts and resets still may.
 const sent = new Date();
 await sendNewsletter();
-await qa.expectNoEmail(unsubscribed.address, { since: sent, timeout: 20 });
+await qa.expectNoEmail(unsubscribed.address, { since: sent, timeout: 20, category: 'marketing' });
 
 // A sign-up sends one verification email, not two.
 await qa.waitForLink(address, { since: submitted });
@@ -131,6 +132,22 @@ expect((await qa.countEmails(address, { since: submitted, type: 'link' })).count
 
 To test more of an email template's wording or layout, `qa.messages(address, { includeHtml: true })` returns each email's cleaned HTML. The sender wrote that content, so treat it as untrusted data.
 
+## Offers, newsletters and receipts
+
+```ts
+// The coupon from a welcome offer, which can take minutes, with its discount and end date.
+const offer = await qa.waitForCode(address, { type: 'coupon', since: submitted, timeout: 300 });
+expect(offer.discount).toBe('20% off');
+
+// Unsubscribe the way a person would: the email's own link, opened in the test's browser.
+await page.goto(await qa.waitForLink(address, { type: 'unsubscribe', since: submitted }));
+
+// An order confirmation carries its invoice.
+const receipt = await qa.checkEmail(address, { since: ordered, category: 'transactional', expectAttachment: ['.pdf'] });
+expect(receipt.failed).toEqual([]);
+```
+
+`type: 'list_unsubscribe'` returns the List-Unsubscribe header's one-click URL instead; POST `List-Unsubscribe=One-Click` to it, as an inbox's button does. Proxy Mail QA never opens these links itself. `checkEmail` warns (`coupon_expiry`) when an offer doesn't say when its coupon ends. In Python: `wait_for_coupon(address, since=submitted)`, `wait_for_link(address, since=submitted, type="unsubscribe")`, `check_email(address, since=ordered, category="transactional", expect_attachment=[".pdf"])` and `expect_no_email(address, since=sent, category="marketing")`.
 ## Accounts in a known state
 
 For a test that needs an existing account (verified, on a paid plan), `withAccount` lends one tagged with that state that no other test has, and always gives it back. Its hooks run your own code against the app (an admin API, a database seed or the UI), here called `app`; Proxy Mail QA never signs in to it:

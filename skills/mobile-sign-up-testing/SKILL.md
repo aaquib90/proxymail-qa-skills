@@ -49,7 +49,7 @@ If the email has both a web link and one that opens the app (`myapp://…`), the
 
 Detox and Appium tests can use the `proxymail-qa` npm package directly. In every framework, record the time just before submitting the form and pass it as `since` to the wait, so it never picks up an earlier run's code.
 
-Every helper also has, in its own language: `countEmails` and `checkEmail` (pass the app's link domain as the expected host), `expectNoEmail`, `signInAccount` for a saved test account, `checkOutAccount` and `returnAccount` to borrow one no other test has, and `unused` on the code wait for a resent code. In CI with the Proxy Mail QA GitHub Action, pass `PROXYMAIL_QA_RUN` to the tests the same way as the key and give each helper the test's name, so the pull request's report says which test each email came from. Maestro's script takes the same as actions (`count`, `check`, `none`, `signin`, `checkout`, `return`).
+Every helper also has, in its own language: `countEmails` and `checkEmail` (pass the app's link domain as the expected host), `expectNoEmail` (pass `marketing` as its category, for a newsletter that should stop after unsubscribing), `signInAccount` for a saved test account, `checkOutAccount` and `returnAccount` to borrow one no other test has, and `unused` on the code wait for a resent code. In CI with the Proxy Mail QA GitHub Action, pass `PROXYMAIL_QA_RUN` to the tests the same way as the key and give each helper the test's name, so the pull request's report says which test each email came from. Maestro's script takes the same as actions (`count`, `check`, `none`, `signin`, `checkout`, `return`).
 
 ## What to check in the app
 
