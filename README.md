@@ -6,6 +6,8 @@ Code, Codex, Cursor, Qoder, OpenCode and other agents that read skills.
 
 | Skill | What it does |
 | --- | --- |
+| [account-email-audit](skills/account-email-audit/SKILL.md) | Triggers every account email an app sends (verification, reset, sign-in, invite, email change), checks each one's sending setup, links, expiry and layout, and lists what to fix |
+| [age-and-region-testing](skills/age-and-region-testing/SKILL.md) | Tests age gates, parental consent, age-restricted content and country rules with test accounts of exact ages and countries, tagged for the next run |
 | [auth-regression-pack](skills/auth-regression-pack/SKILL.md) | Checks sign-up, password reset and invitation emails the same way every time, including reused and replaced links, and reports what changed since the last run |
 | [email-delivery-troubleshooting](skills/email-delivery-troubleshooting/SKILL.md) | Finds out why an app's emails aren't arriving: email providers in sandbox mode (Amazon SES, Resend, Mailgun, Postmark, Supabase), suppression lists, rate limits and links that point at localhost |
 | [email-e2e-tests](skills/email-e2e-tests/SKILL.md) | Writes Playwright, Cypress, Puppeteer and pytest tests that sign up, read the code or link, check the email and finish the flow, and runs them in CI with a report on the pull request |
