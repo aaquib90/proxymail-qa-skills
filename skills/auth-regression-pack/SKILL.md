@@ -33,3 +33,9 @@ Start a run with `start_run` named after the site, such as `Auth regression pack
 Then `finish_run` and show the person the report: what failed, and the "Compared with the last runs" list, which flags slower emails, extra emails, new or intermittent failures, newly failing checks and a new sender or link site.
 
 A step the app has no flow for is skipped with a note, not failed.
+
+## Check it worked
+
+- The run's report lists every step above with a verdict, or a note saying why the app has no such flow.
+- Each link-reuse and old-link step has a note, with `failed: true` wherever the app accepted a link it should have refused.
+- Nothing was done on a live site or a real person's account.
