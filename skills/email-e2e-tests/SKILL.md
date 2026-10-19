@@ -142,6 +142,10 @@ expect(offer.discount).toBe('20% off');
 // A one-time offer: signing up again as name+promo1@… (same inbox) should get nothing.
 expect((await qa.offers(address)).passed).toBe(true);
 
+// At checkout on staging (test payments only): record what the app did.
+const result = await qa.recordCouponResult(address, 'accepted', { message: await page.getByRole('status').innerText() });
+expect(result.check?.status).toBe('pass');
+
 // Unsubscribe the way a person would: the email's own link, opened in the test's browser.
 await page.goto(await qa.waitForLink(address, { type: 'unsubscribe', since: submitted }));
 await qa.markUnsubscribed(address, { service: 'acme.com' });
@@ -153,7 +157,7 @@ const receipt = await qa.checkEmail(address, { since: ordered, category: 'transa
 expect(receipt.failed).toEqual([]);
 ```
 
-`type: 'list_unsubscribe'` returns the List-Unsubscribe header's one-click URL instead; POST `List-Unsubscribe=One-Click` to it, as an inbox's button does. Proxy Mail QA never opens these links itself. `checkEmail` warns (`coupon_expiry`) when an offer doesn't say when its coupon ends, and on a marketing email also checks its List-Unsubscribe headers, unsubscribe link and preview text (`list_unsubscribe`, `one_click_unsubscribe`, `unsubscribe_link`, `preheader`); pass `category` or `type` so a sign-in test checks the email it means. `markUnsubscribed` makes any later marketing email from that sender fail `after_unsubscribe` in `checkEmail`, however long after; `markResubscribed` ends it. In Python: `wait_for_coupon(address, since=submitted)`, `wait_for_link(address, since=submitted, type="unsubscribe")`, `mark_unsubscribed(address, service="acme.com")`, `check_unsubscribe(address)["passed"]`, `offers(address)["passed"]`, `check_email(address, since=ordered, category="transactional", expect_attachment=[".pdf"])` and `expect_no_email(address, since=sent, category="marketing")`.
+`type: 'list_unsubscribe'` returns the List-Unsubscribe header's one-click URL instead; POST `List-Unsubscribe=One-Click` to it, as an inbox's button does. Proxy Mail QA never opens these links itself. `checkEmail` warns (`coupon_expiry`) when an offer doesn't say when its coupon ends, and on a marketing email also checks its List-Unsubscribe headers, unsubscribe link and preview text (`list_unsubscribe`, `one_click_unsubscribe`, `unsubscribe_link`, `preheader`); pass `category` or `type` so a sign-in test checks the email it means. `markUnsubscribed` makes any later marketing email from that sender fail `after_unsubscribe` in `checkEmail`, however long after; `markResubscribed` ends it. In Python: `wait_for_coupon(address, since=submitted)`, `wait_for_link(address, since=submitted, type="unsubscribe")`, `mark_unsubscribed(address, service="acme.com")`, `check_unsubscribe(address)["passed"]`, `offers(address)["passed"]`, `record_coupon_result(address, "accepted", message=...)["check"]`, `check_email(address, since=ordered, category="transactional", expect_attachment=[".pdf"])` and `expect_no_email(address, since=sent, category="marketing")`.
 ## Accounts in a known state
 
 For a test that needs an existing account (verified, on a paid plan), `withAccount` lends one tagged with that state that no other test has, and always gives it back. Its hooks run your own code against the app (an admin API, a database seed or the UI), here called `app`; Proxy Mail QA never signs in to it:

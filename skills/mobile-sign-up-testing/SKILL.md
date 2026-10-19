@@ -30,7 +30,7 @@ The app's email provider must be able to send to any address. In sandbox or test
 6. Take a screenshot and check the app shows the account as verified or signed in, on the right screen. Take another before deciding a step failed.
 7. Check the email itself with `check_email` and `"expect_host"` set to the domain the app's links open (its Universal Link or App Link domain), and `count_emails` for a duplicate. When the app runs against a server on the computer (`localhost:3000`, or `10.0.2.2:3000` from the Android emulator), mark that host once with `mark_dev_host`, so its links pass.
 
-For an offer the app sends after sign-up, `wait_for_code` with `"kind": "coupon"` returns its coupon (with the discount and valid-until date the email states, and `after_seconds`, how long it took); type it into the app's promo field.
+For an offer the app sends after sign-up, `wait_for_code` with `"kind": "coupon"` returns its coupon (with the discount and valid-until date the email states, and `after_seconds`, how long it took); type it into the app's promo field. To test checkout, use only the platform's sandbox (StoreKit testing in Xcode, Google Play test cards, or the app's test mode), then `record_coupon_result` with what the app did (`accepted`, `rejected` or `error`) and its message.
 
 To sign in again as an account made earlier, `list_addresses` with `"environment"` and `"has_password": true` finds it; where the connection has `get_sign_in`, that returns the account and its password in one call.
 
