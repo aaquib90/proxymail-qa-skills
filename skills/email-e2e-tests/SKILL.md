@@ -102,7 +102,7 @@ Puppeteer, Jest and Vitest use the same calls as the Playwright example. Match t
 
 ## Check the email itself
 
-After the wait, `checkEmail` checks the email that arrived: SPF, DKIM and DMARC, links to localhost or plain http, where its link goes, a stated expiry, its size and whether it fits a phone, attachments inboxes block (`harmful_attachment`), and `spam_risk`, an estimate of whether inboxes would reject it or file it as spam. It returns verdicts, never the email's text.
+After the wait, `checkEmail` checks the email that arrived: SPF, DKIM and DMARC, links to localhost or plain http, where its link goes, a stated expiry, its size and whether it fits a phone, attachments inboxes block (`harmful_attachment`), and `spam_risk`, a spam score out of 10 with the markers that add up to it: 5 or more fails (likely rejected or sent to spam), 1.5 or more warns. It returns verdicts, never the email's text.
 
 ```ts
 const result = await qa.checkEmail(address, { since: submitted, type: 'link', expectHost: 'staging.example.com' });
