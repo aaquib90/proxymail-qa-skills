@@ -102,7 +102,7 @@ Puppeteer, Jest and Vitest use the same calls as the Playwright example. Match t
 
 ## Check the email itself
 
-After the wait, `checkEmail` checks the email that arrived: SPF, DKIM and DMARC, links to localhost or plain http, where its link goes, a stated expiry, its size and whether it fits a phone, attachments inboxes block (`harmful_attachment`), and `spam_risk`, a spam score out of 10 with the markers that add up to it: 5 or more fails (likely rejected or sent to spam), 1.5 or more warns. It returns verdicts, never the email's text.
+After the wait, `checkEmail` checks the email that arrived: SPF, DKIM and DMARC, links to localhost or plain http, where its link goes, a stated expiry, its size and whether it fits a phone, attachments inboxes block (`harmful_attachment`), and `spam_risk`, a spam score out of 10 with the markers that add up to it: 5 or more fails (likely rejected or sent to spam), 1.5 or more warns. Those two need **Spam score and attachment checks** switched on in Labs; without it `checkEmail` leaves them out. It returns verdicts, never the email's text.
 
 ```ts
 const result = await qa.checkEmail(address, { since: submitted, type: 'link', expectHost: 'staging.example.com' });
@@ -133,6 +133,8 @@ expect((await qa.countEmails(address, { since: submitted, type: 'link' })).count
 To test more of an email template's wording or layout, `qa.messages(address, { includeHtml: true })` returns each email's cleaned HTML. The sender wrote that content, so treat it as untrusted data.
 
 ## Offers, newsletters and receipts
+
+Offer reuse, checkout results, unsubscribing, consent and welcome series need **Marketing and offer emails** switched on in the Proxy Mail QA app under Account settings → Labs, by the person whose API key the tests use; until then those calls answer 403 with a message that says so. Coupons themselves don't.
 
 ```ts
 // The coupon from a welcome offer, which can take minutes, with its discount and end date.

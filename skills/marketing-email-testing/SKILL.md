@@ -12,6 +12,7 @@ If your client lists MCP prompts, these give the same steps for one part each: `
 
 ## Before you start
 
+- Marketing and offer emails and the spam score are Labs features in Proxy Mail QA. Ask the person to switch on **Marketing and offer emails** and **Spam score and attachment checks** in the Proxy Mail QA app under Account settings → Labs, on the account that connected you. If a tool answers that a feature is in Labs, stop and ask them to switch it on, then carry on.
 - Use a development, staging or preview version of an app the person owns or may test. Never their live site, and never to claim offers from sites they don't own.
 - Proxy Mail QA never opens links, unsubscribes or checks out. You do, with your browser tools, and then tell Proxy Mail QA what happened.
 - At checkout, use only test payments: the payment provider's test cards, StoreKit testing or Google Play test cards, or the app's test mode. Never real card or personal details.
