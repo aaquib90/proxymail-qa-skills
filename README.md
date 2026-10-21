@@ -13,7 +13,7 @@ Code, Codex, Cursor, Qoder, OpenCode and other agents that read skills.
 | [Email end-to-end tests](skills/email-e2e-tests/SKILL.md) | `email-e2e-tests` | Writes Playwright, Cypress, Puppeteer and pytest tests that sign up, read the code or link, check the email and finish the flow, and runs them in CI with a report on the pull request |
 | [Marketing and offer email testing](skills/marketing-email-testing/SKILL.md) | `marketing-email-testing` | Tests welcome coupons and checkout, one offer per person, unsubscribing that sticks, consent rules by country, welcome series timing and spam risk, on staging with test payments only |
 | [Mobile app sign-up testing](skills/mobile-sign-up-testing/SKILL.md) | `mobile-sign-up-testing` | Tests sign-up in iOS, Android, React Native, Expo and Flutter apps, by driving a simulator or with Maestro, XCUITest, Espresso, Detox or Appium |
-| [Sign-up form email validation](skills/signup-form-email-validation/SKILL.md) | `signup-form-email-validation` | Checks a form accepts valid but unusual addresses (plus tags, apostrophes, capitals) and rejects invalid ones |
+| [Sign-up form email validation](skills/signup-form-email-validation/SKILL.md) | `signup-form-email-validation` | Checks a form accepts valid but unusual addresses (plus tags, apostrophes, capitals), names (apostrophes, accents, other scripts, very long ones) and passwords (the field's limits, each symbol class, spaces), rejects invalid ones, and stores HTML or SQL in a name as text |
 
 ## Install
 
