@@ -11,7 +11,7 @@ cd "$(dirname "$0")/.."
 ./scripts/check-skills.sh "$@"
 cd skills
 suffix=""
-[ "$#" -gt 0 ] && suffix="-$1$([ "$#" -gt 1 ] && echo "-and-$(($# - 1))-more")"
+[ "$#" -gt 0 ] && suffix="-$1$([ "$#" -gt 1 ] && echo "-and-$(($# - 1))-more" || true)"
 if [ "$#" -eq 0 ]; then
   for d in */; do [ -f "$d/SKILL.md" ] && set -- "$@" "${d%/}"; done
 fi
