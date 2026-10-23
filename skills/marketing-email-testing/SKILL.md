@@ -1,7 +1,7 @@
 ---
 name: marketing-email-testing
 description: Test an app's marketing and offer emails with Proxy Mail QA - welcome coupons and checkout, one offer per person, unsubscribing that sticks, consent rules by country, welcome series timing and spam risk - ending in a report. Use on a staging or development site, with test payments only.
-version: 1.0.0
+version: 1.0.1
 ---
 
 # Testing marketing and offer emails
@@ -21,7 +21,7 @@ If your client lists MCP prompts, these give the same steps for one part each: `
 
 ## Steps
 
-Start a run with `start_run` named after the site, such as `Marketing emails at staging.example.com`, with the same name every time, so the report compares runs. Pass `run_id` on every call, and `test` with the step's name.
+Start a run with `start_run` named after the site, such as `Marketing emails at staging.example.com`, with the same name every time, so the report compares runs. Pass `run_id` on every call that takes it, and `test` with the step's name. `record_consent` and `check_sequence` don't add to the run: put what they answered in your table.
 
 1. **offer**: `create_address`, with a `country` if the rules matter (such as `GB`, `DE`, `US`). Sign up for the offer, noting the time just before as `since`. If the form had a marketing box, `record_consent` with what you chose: `marketing` (`opted_in` or `declined`) and `prechecked` if it started ticked. `wait_for_code` with `"kind": "coupon"` and `since` returns the coupon with its `discount`, `valid_until` and `after_seconds`; offers often take minutes, so call again rather than giving up after one wait. Then `check_email` with `"category": "marketing"` and `"expect_within": "5m"`.
 2. **checkout**: apply the coupon at checkout and `record_coupon_result` with `accepted`, `rejected` or `error`, the app's message, and `"one_time": true` if the offer is meant for one use. Apply it again: a one-time coupon should be refused. Record that too. If the coupon has a `valid_until` in the past, try it and record the result: accepting it fails.

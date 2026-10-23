@@ -1,7 +1,7 @@
 ---
 name: email-e2e-tests
 description: Writes automated end-to-end tests for sign-up, email verification, login codes (OTP), magic links, password resets and invites, using disposable Proxy Mail QA inboxes from Playwright, Cypress, Puppeteer, Jest, Vitest or pytest, and runs them in CI such as GitHub Actions. Also checks that an email was sent exactly once or not at all, its links, text, language and phone layout, and reports which test each email came from. Use when someone asks to test or automate an email flow, read a verification code or link in a test, or assert on the emails an app sends.
-version: 1.2.0
+version: 1.2.1
 ---
 
 # End-to-end tests for email flows
@@ -208,7 +208,7 @@ Store the key as a CI secret named `PROXYMAIL_QA_API_KEY` and pass it to the tes
 
 ### A report on the pull request
 
-The GitHub Action `aaquib90/proxymail-qa-action@v1` starts a run before the tests and posts its report on the pull request: which emails arrived and how fast, the checks, and emails that never came. The client and the Python helper join the run through `PROXYMAIL_QA_RUN` with no changes to the tests.
+The GitHub Action `aaquib90/proxymail-qa-action@v1` starts a run before the tests and posts its report on the pull request: which emails arrived and how fast, the checks, failed tests, and emails that never came, compared with the runs before. The client and the Python helper join the run through `PROXYMAIL_QA_RUN` with no changes to the tests.
 
 ```yaml
       - uses: aaquib90/proxymail-qa-action@v1
