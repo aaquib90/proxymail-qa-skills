@@ -1,7 +1,7 @@
 ---
 name: signup-form-email-validation
 description: Checks that an app's sign-up, login or invite form accepts valid but unusual email addresses (capitals, plus tags, apostrophes such as o'brien, ampersands, slashes, the 64-character maximum), names (apostrophes, accents, other scripts, very long ones) and passwords (the field's limits, each symbol class, spaces), rejects invalid ones, and stores HTML or SQL in a name as text. Uses Proxy Mail QA address variants whose mail still reaches a real test inbox, and its name and password variants. Use when someone asks to test email, name or password validation in a form, asks why a user's address or name is rejected, or wants to know whether plus addressing works in their app.
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Testing email, name and password validation in sign-up forms
@@ -20,21 +20,22 @@ Sign-up forms often turn away values that are perfectly valid, such as a plus ta
    - `delivered`: valid variants whose mail arrives in this address's inbox. The app should accept them.
    - `undeliverable`: valid by the email standard, but refused by most mail servers. Decide with the person what the app should do with them.
    - `invalid`: the app should reject them before it sends anything.
-3. For each `delivered` variant:
+3. If the form has fields besides the email, name and password (company size, how someone heard about the app), get their values with `form_values` and the address from step 1, sending what the page says about each field (`test_id`, `required` and the rest) with `site` and `page`. The project's custom fields fill them (`kind: "custom"`); a field nobody taught gets a guess (`kind: "guess"`) when the project guesses. Use the same values for every variant, so only the field under test changes, and note which fields were guessed for the report. If a required field comes back empty, ask the person for a custom field for it (the `sign-up-form-setup` skill) rather than making up a value.
+4. For each `delivered` variant:
    1. Sign up with it exactly as given.
    2. Wait on that same variant with `wait_for_code` or `wait_for_link`. Waiting on a `+tag` variant only finds mail sent to that tag.
    3. Finish the sign-up, then sign in with the same variant.
    4. Note what the app stored: the address as typed, or lower-cased consistently. An app that changes the address can fail to match it at sign-in.
-4. For each `invalid` variant, submit the form and check it refuses the address with a clear message, without creating an account or sending an email.
-5. For `undeliverable` variants, check the app either refuses them or copes when the email bounces: no crash, and the user is told what to do.
-6. If the form has name fields, get values for each with `get_name_variants` (`{"field": "first_name", "max_length": 50}`, with the field's maximum when the page states one). Four lists, each entry with the `value` to type and what it `tests`:
+5. For each `invalid` variant, submit the form and check it refuses the address with a clear message, without creating an account or sending an email.
+6. For `undeliverable` variants, check the app either refuses them or copes when the email bounces: no crash, and the user is told what to do.
+7. If the form has name fields, get values for each with `get_name_variants` (`{"field": "first_name", "max_length": 50}`, with the field's maximum when the page states one). Four lists, each entry with the `value` to type and what it `tests`:
    - `accept`: a real person's name (`O'Brien`, `José`, `Straße`, `李`, `محمد`, `สมชาย`, one letter, exactly the maximum). The app should take it as typed: check the profile shows it unchanged.
    - `reject`: over the maximum, empty, only spaces. The app should refuse it with a clear message.
    - `store_as_text`: a bold tag around a name, a script tag, a SQL injection, a template expression (`{{7*7}}`). The app should store and show it exactly as typed, never run it: check the profile page shows the literal text, not bold text or `49`.
    - `decide`: digits, symbols, an emoji, spaces around, composed and decomposed accents, very long names. Apps differ: note what the app did (accepted, rejected, or changed it: trimmed, escaped, cut short).
    Use a fresh address per accepted value, or the same address with the name changed, as the person prefers.
-7. If the form has a password field, get values with `get_password_variants` and the field's rules (`{"min_length": 8, "max_length": 64, "symbols": true}`): `accept` (exactly the minimum and the maximum, each symbol class including quotes, a backslash and a space, non-ASCII letters), `reject` (one under or over, a symbol where none are allowed) and `decide` (only digits, only lower case, a space at the start or end, an emoji, composed and decomposed accents, and a pair sharing their first 72 bytes when the maximum allows). For each accepted password, set it with the form, then sign in with it as typed: a password that's trimmed, cut short or re-encoded on the way in won't. For the composed and decomposed pair, set one and sign in with the other; for the 72-byte pair, the second must not sign in as the first.
-8. Report the results as a table per field: the value, what it tests, whether the form accepted it, what the app stored (as typed, or changed), and for addresses whether the email arrived and for addresses and passwords whether signing in worked.
+8. If the form has a password field, get values with `get_password_variants` and the field's rules (`{"min_length": 8, "max_length": 64, "symbols": true}`): `accept` (exactly the minimum and the maximum, each symbol class including quotes, a backslash and a space, non-ASCII letters), `reject` (one under or over, a symbol where none are allowed) and `decide` (only digits, only lower case, a space at the start or end, an emoji, composed and decomposed accents, and a pair sharing their first 72 bytes when the maximum allows). For each accepted password, set it with the form, then sign in with it as typed: a password that's trimmed, cut short or re-encoded on the way in won't. For the composed and decomposed pair, set one and sign in with the other; for the 72-byte pair, the second must not sign in as the first.
+9. Report the results as a table per field: the value, what it tests, whether the form accepted it, what the app stored (as typed, or changed), and for addresses whether the email arrived and for addresses and passwords whether signing in worked. Below the tables, list the form's other fields that were guessed, with the value used.
 
 ## The variants
 
@@ -81,6 +82,7 @@ Names and passwords come from `get_name_variants` and `get_password_variants`; t
 - Every `invalid` variant was refused before anything was sent.
 - Every `accept` name shows on the profile as typed; every `store_as_text` name shows as literal text.
 - Every `accept` password signs in as typed.
+- No required field was left empty on any sign-up: each came from a custom field, a guess you checked, or the person.
 - After a fix, run the same variants again and compare the tables.
 
 ## Precautions

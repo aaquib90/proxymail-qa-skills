@@ -1,7 +1,7 @@
 ---
 name: auth-regression-pack
 description: Run a repeatable check of an app's sign-up, password reset and invitation emails and links with Proxy Mail QA, including link reuse and replaced links, ending in a report that says what changed since the last run. Use after changes to auth or email code, on a staging or development site.
-version: 1.0.0
+version: 1.1.0
 ---
 
 # The auth regression pack
@@ -20,7 +20,7 @@ If your client lists MCP prompts, the `auth_regression_pack` prompt gives the sa
 
 Start a run with `start_run` named after the site, such as `Auth regression pack at staging.example.com`, with the same name every time, so its report compares this run with the last ones. Pass `run_id` on every Proxy Mail QA call, and `test` with the step's name (below), so the report says which step each email belongs to.
 
-1. **sign-up**: `form_values` with what the sign-up page says about each field (or `create_address` with `password: true` for an email-only form). Fill in and submit the form, noting the time just before as `since`. `wait_for_link` or `wait_for_code` with `since`, finish the sign-up and check you are signed in. `check_email` with `expect_host` set to the site's host. `count_emails` with `since`: exactly one email should have come.
+1. **sign-up**: `form_values` with what the sign-up page says about each field (`test_id` and `required` included), with `site` and `page` (or `create_address` with `password: true` for an email-only form). The project's custom fields fill the form's own fields (`kind: "custom"`), and a field nobody taught gets a guess (`kind: "guess"`) when the project guesses: check each guess suits the test, and `add_run_note` naming the guessed fields. Over several screens, call `form_values` once per screen with the same `address`. If a required field comes back empty, ask the person for a custom field for it (the `sign-up-form-setup` skill) rather than making up a value. Fill in and submit the form, noting the time just before as `since`. `wait_for_link` or `wait_for_code` with `since`, finish the sign-up and check you are signed in. `check_email` with `expect_host` set to the site's host. `count_emails` with `since`: exactly one email should have come.
 2. **sign-up › link reuse** (if sign-up used a link): in a new private browser session, open the same verify link again. It must not sign anyone in or verify anything again. `add_run_note` with what happened, `failed: true` if it accepted the link.
 3. **reset** (if the app has a forgot-password page): sign out, ask for a reset, `wait_for_link` with `kind: reset`, `check_email`. Ask for a second reset and get the newer link with `unused: true`.
 4. **reset › old link**: open the first, older reset link. Asking again should have stopped it working. `add_run_note`, `failed: true` if it still let you set a password.
@@ -30,7 +30,7 @@ Start a run with `start_run` named after the site, such as `Auth regression pack
 8. **invite › link reuse**: open the same invitation link in another new session. It must not let a second person in.
 9. **expiry**: from the `check_email` answers, note how long each code or link says it lasts, and note any that doesn't say. Don't wait for anything to expire.
 
-Then `finish_run` and show the person the report: what failed, and the "Compared with the last runs" list, which flags slower emails, extra emails, new or intermittent failures, newly failing checks and a new sender or link site.
+Then `finish_run` and show the person the report: what failed, the fields that were guessed, and the "Compared with the last runs" list, which flags slower emails, extra emails, new or intermittent failures, newly failing checks and a new sender or link site.
 
 A step the app has no flow for is skipped with a note, not failed.
 
@@ -38,4 +38,5 @@ A step the app has no flow for is skipped with a note, not failed.
 
 - The run's report lists every step above with a verdict, or a note saying why the app has no such flow.
 - Each link-reuse and old-link step has a note, with `failed: true` wherever the app accepted a link it should have refused.
+- No required field was left empty at sign-up: each came from a custom field, a guess you checked, or the person.
 - Nothing was done on a live site or a real person's account.
