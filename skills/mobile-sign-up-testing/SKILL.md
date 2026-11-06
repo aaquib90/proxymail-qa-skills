@@ -1,7 +1,7 @@
 ---
 name: mobile-sign-up-testing
 description: Tests sign-up, email verification codes, magic links and password resets in iOS, Android, React Native, Expo and Flutter apps with disposable Proxy Mail QA inboxes, either by driving the iOS Simulator or Android emulator directly or by writing Maestro, XCUITest, Espresso, Detox, Appium or Flutter integration tests. Covers opening verify links in the app (Universal Links, App Links, custom schemes such as myapp:// and exp://), cold-start link handling and localhost links on the Android emulator. Use when someone asks to test a mobile app's sign-up, login code or email link.
-version: 1.2.0
+version: 1.2.1
 ---
 
 # Testing sign-up emails in mobile apps
@@ -22,7 +22,7 @@ The app's email provider must be able to send to any address. In sandbox or test
 1. Build the app and launch it in the iOS Simulator or Android emulator.
 2. Create an address with `create_address` and `{"label": "Mobile sign-up", "password": true}`. Add `"age"` or `"country"` if the form asks for a date of birth or where the user lives, and `"environment"` (such as `"staging"`) for the build being tested, so the person can find the account later.
 3. Tap into the sign-up form and type the address and password. The screen can lag a moment: check a screenshot shows what was typed before tapping the button.
-4. Wait with `wait_for_code`, or `wait_for_link` for a link. Each waits up to 30 seconds.
+4. Wait with `wait_for_code`, or `wait_for_link` for a link, with `since` set to the time just before you tapped the button. Each waits up to 30 seconds.
 5. Type the code into the app. If the app shows one box per digit, tap the first box and type the whole code: most move to the next box on each digit. If a box keeps only one digit and focus doesn't move, fill each box in order. Check every digit is in place before submitting: a partial code counts as a wrong attempt. Or open the link on the device, not in a desktop browser, so the app handles it:
    - iOS Simulator: `xcrun simctl openurl booted "$LINK"`, with the link in the `LINK` shell variable. For a custom scheme, iOS first asks "Open in …?": tap Open.
    - Android emulator: `adb shell "am start -W -a android.intent.action.VIEW -d '$LINK'"` (the inner quotes keep `&` in the link from splitting the command on the device).
@@ -72,6 +72,7 @@ These are the bugs that usually break mobile sign-up:
 
 ## Precautions
 
+- Test only development, staging or preview builds of apps the person owns or may test, never a live app or real users' accounts.
 - Never put an API key in the app, its configuration files or the shipped bundle.
 - Only use test accounts on the simulator or emulator: screenshots of the device may be sent to the AI provider along with the conversation.
 - Use the password `create_address` makes, never a real one, and don't print it in summaries.

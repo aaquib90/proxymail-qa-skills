@@ -1,7 +1,7 @@
 ---
 name: email-delivery-troubleshooting
 description: Finds out why an app's sign-up, verification, login-code, magic-link, password-reset or invite emails aren't arriving, and fixes the cause. Covers email providers in sandbox or test mode (Amazon SES, Resend, Mailgun, Postmark, Supabase's built-in email), suppression lists, rate limits, verification links that point at localhost, and checking a test inbox with Proxy Mail QA. Use when someone says a verification email never came, the code isn't arriving, the reset email doesn't send, or the link in the email is broken.
-version: 1.0.0
+version: 1.0.2
 ---
 
 # Why an app's emails aren't arriving
@@ -29,7 +29,7 @@ Usually the email never left the app: the email provider didn't send it, or the 
 | Mailgun | A sandbox domain only sends to up to 5 authorised recipients, who each have to confirm. | Send from your own domain (Mailgun needs a paid plan or a card on file for that): https://documentation.mailgun.com/docs/mailgun/user-manual/domains/domains-sandbox |
 | Postmark | Until Postmark approves the account, only sends to addresses on verified domains. | Request approval in the Postmark account: https://postmarkapp.com/support/article/1084-how-does-the-account-approval-process-work |
 
-Firebase Authentication, Clerk and SendGrid send to any address. So does Auth0's built-in email, but only 10 emails a minute, so set up your own provider in Auth0 for test runs. These limits were checked against each provider's documentation on 13 October 2026; if the dashboard says something different, follow the provider's current docs.
+Firebase Authentication, Clerk and SendGrid send to any address. So do Auth0's and Amazon Cognito's built-in senders, but Auth0's sends only 10 emails a minute and Cognito's (from `no-reply@verificationemail.com`) only 50 a day per AWS account, with the count resetting at 09:00 UTC, so set up your own provider for test runs. These limits were checked against each provider's documentation on 13 October 2026 (Amazon Cognito's on 29 October 2026); if the dashboard says something different, follow the provider's current docs.
 
 **The app didn't send it.** A sign-up that failed, an email turned off in settings, a background job that errored or a worker that isn't running all look the same from the inbox. Follow the code path from the form to the send call and check each step ran.
 
@@ -37,7 +37,7 @@ Firebase Authentication, Clerk and SendGrid send to any address. So does Auth0's
 
 **The address is wrong.** A typo, or a form that changed it (capitalised the first letter, autocorrected it, trimmed a `+tag`). Check what the app stored, not what was typed.
 
-**The app is rate limited.** Auth services cap emails: 2 an hour with Supabase's built-in email, and 30 an hour by default with your own SMTP in Supabase. A test suite that signs up often hits the cap first.
+**The app is rate limited.** Auth services cap emails: 2 an hour with Supabase's built-in email, 30 an hour by default with your own SMTP in Supabase, and 50 a day per AWS account with Amazon Cognito's built-in sender. A test suite that signs up often hits the cap first.
 
 **The inbox refused it.** Proxy Mail QA refuses messages over 5 MB (they won't arrive), more than 60 emails an hour to one address, and mail over the space's daily limit (for those two the sender retries later, so it may still arrive). Mail to an expired or deleted address is refused too: create a new one.
 
@@ -79,6 +79,7 @@ If mail stopped reaching every Proxy Mail QA address at once, including ones tha
 
 ## Precautions
 
+- Test only on development, staging or preview versions of apps the person owns or may test, never a live site or real users' accounts.
 - Requesting SES production access, verifying a domain, changing SMTP settings or DNS, and upgrading a provider plan are the person's decisions. Explain what's needed and why; don't change provider accounts or production settings without their go-ahead.
 - Never paste or print API keys, SMTP passwords or provider tokens, and never commit them. Read them from the environment.
 - Only send test emails to test addresses, never to real people's inboxes.
