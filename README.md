@@ -33,7 +33,8 @@ The troubleshooting skill is useful without an account.
 
 For Claude Code, Cursor and Qoder there's also a
 [plugin](https://github.com/aaquib90/proxymail-qa-plugin) that adds the MCP
-server, the main sign-up skill and the auth regression pack.
+server and nine skills: an email flow testing skill of its own, and every skill
+here except email end-to-end tests, whose tests need an API key.
 
 ## Qoder
 
