@@ -1,7 +1,7 @@
 ---
 name: marketing-email-testing
 description: Test an app's marketing and offer emails with Proxy Mail QA - welcome coupons and checkout, one offer per person, unsubscribing that sticks, consent rules by country, welcome series timing and spam risk - ending in a report. Use on a staging or development site, with test payments only.
-version: 1.0.1
+version: 1.0.2
 ---
 
 # Testing marketing and offer emails
@@ -12,7 +12,7 @@ If your client lists MCP prompts, these give the same steps for one part each: `
 
 ## Before you start
 
-- Marketing and offer emails and the spam score are Labs features in Proxy Mail QA. Ask the person to switch on **Marketing and offer emails** and **Spam score and attachment checks** in the Proxy Mail QA app under Account settings → Labs, on the account that connected you. If a tool answers that a feature is in Labs, stop and ask them to switch it on, then carry on.
+- The project needs to test Offers or Marketing, and have its spam checks on, in the Proxy Mail QA app under Project settings → What you test. If the coupon or marketing tools aren't listed, `get_project` shows its `areas` and `spam_checks`: ask the person to tick Offers and Marketing and switch Spam checks on there (or, if they agree and their key is the project lead's, call `update_project` with `areas`, the whole list, and `spam_checks: true`), then reconnect.
 - Use a development, staging or preview version of an app the person owns or may test. Never their live site, and never to claim offers from sites they don't own.
 - Proxy Mail QA never opens links, unsubscribes or checks out. You do, with your browser tools, and then tell Proxy Mail QA what happened.
 - At checkout, use only test payments: the payment provider's test cards, StoreKit testing or Google Play test cards, or the app's test mode. Never real card or personal details.
@@ -29,7 +29,7 @@ Start a run with `start_run` named after the site, such as `Marketing emails at 
 4. **unsubscribe**: `wait_for_link` with `"kind": "unsubscribe"` (or `"list_unsubscribe"` for the header's one-click address, which takes a POST of `List-Unsubscribe=One-Click`). Unsubscribe in your browser, then `mark_unsubscribed` with the email's `email_id` and the time you did it (and `grace`, such as `1d`, if the app says marketing already queued may still come). Trigger another marketing email, then `expect_no_email` with `"category": "marketing"` and `until` up to an hour after `since`. Trigger a receipt or a password reset too: it should still arrive. `check_unsubscribe` lists any marketing that came after.
 5. **rules by country** (if the app markets to more than one country): one account per country that declines marketing, and one that opts in. Trigger marketing to each and `check_email` with `"category": "marketing"`. Its rule checks name the rule, the place and the source.
 6. **welcome series** (if the app sends one): once it should be over, `check_sequence` with `since` and a step per email: `subject` (a phrase from it), `after` (`"1d"`) and `within`. Steps answer `pass`, `early`, `late`, `missing` or `waiting`.
-7. **deliverability**: from each `check_email` answer, note `spam_risk`'s `score` out of 10 and its `markers` (an estimate of whether inboxes would reject the email or file it as spam) and `harmful_attachment`.
+7. **deliverability**: from each `check_email` answer, note `spam_risk`'s `inbox_score` out of 10 (10 is good) and its `markers` (an estimate of whether inboxes would reject the email or file it as spam) and `harmful_attachment`.
 
 Then `finish_run` and show the person a table: each email, how long it took, its coupon (the discount, not the code), what checkout did, and every failed or warned check with what to fix, worst first. A step the app has no flow for is skipped with a note, not failed.
 

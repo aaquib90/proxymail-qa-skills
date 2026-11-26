@@ -1,7 +1,7 @@
 ---
 name: email-e2e-tests
 description: Writes automated end-to-end tests for sign-up, email verification, login codes (OTP), magic links, password resets and invites, using disposable Proxy Mail QA inboxes from Playwright, Cypress, Puppeteer, Jest, Vitest or pytest, and runs them in CI such as GitHub Actions. Also checks that an email was sent exactly once or not at all, its links, text, language and phone layout, and reports which test each email came from. Use when someone asks to test or automate an email flow, read a verification code or link in a test, or assert on the emails an app sends.
-version: 1.2.2
+version: 1.2.3
 ---
 
 # End-to-end tests for email flows
@@ -102,7 +102,7 @@ Puppeteer, Jest and Vitest use the same calls as the Playwright example. Match t
 
 ## Check the email itself
 
-After the wait, `checkEmail` checks the email that arrived: SPF, DKIM and DMARC, links to localhost or plain http, where its link goes, a stated expiry, its size and whether it fits a phone, attachments inboxes block (`harmful_attachment`), and `spam_risk`, a spam score out of 10 with the markers that add up to it: 5 or more fails (likely rejected or sent to spam), 1.5 or more warns. Those two need **Spam score and attachment checks** switched on in Labs; without it `checkEmail` leaves them out. It returns verdicts, never the email's text.
+After the wait, `checkEmail` checks the email that arrived: SPF, DKIM and DMARC, links to localhost or plain http, where its link goes, a stated expiry, its size and whether it fits a phone, attachments inboxes block (`harmful_attachment`), and `spam_risk`, an inbox score out of 10 where 10 is good (`inbox_score`), with the markers that lower it: 5 or below fails (likely rejected or sent to spam), 8.5 or below warns. Those two come with the project's spam checks (Project settings → What you test, on for new projects); with them off, `checkEmail` leaves them out. It returns verdicts, never the email's text.
 
 ```ts
 const result = await qa.checkEmail(address, { since: submitted, type: 'link', expectHost: 'staging.example.com' });
@@ -134,7 +134,7 @@ To test more of an email template's wording or layout, `qa.messages(address, { i
 
 ## Offers, newsletters and receipts
 
-Offer reuse, checkout results, unsubscribing, consent and welcome series need **Marketing and offer emails** switched on in the Proxy Mail QA app under Account settings → Labs, by the person whose API key the tests use; until then those calls answer 403 with a message that says so. Coupons themselves don't.
+Offer reuse, checkout results, unsubscribing, consent and welcome series are for projects that test Offers or Marketing, ticked in the Proxy Mail QA app under Project settings → What you test (or with `updateProject({ areas })`, by the project's lead). Coupons themselves work in every project.
 
 ```ts
 // The coupon from a welcome offer, which can take minutes, with its discount and end date.
